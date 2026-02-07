@@ -1,0 +1,141 @@
+{
+  "info": {
+    "name": "Transcribe Lab (Node + Batch Transcribe)",
+    "_postman_id": "c8b2d3d3-transcribe-lab-0000-0000-000000000000",
+    "description": "Upload(학습용) + Start/Get/List/Delete Transcribe Jobs + Result proxy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/health",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Job",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mediaUri\": \"s3://YOUR_BUCKET/transcribe-lab/input/sample.mp3\",\n  \"mediaFormat\": \"mp3\",\n  \"languageCode\": \"ko-KR\",\n  \"identifyLanguage\": false,\n  \"enableSpeakerLabels\": false,\n  \"maxSpeakerLabels\": 2\n}\n"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/jobs",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "jobs"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/jobs",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "jobs"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Job (by name)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/jobs/{{JOB_NAME}}",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "jobs",
+            "{{JOB_NAME}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Stop Job (by name)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/jobs/{{JOB_NAME}}/stop",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "jobs",
+            "{{JOB_NAME}}",
+            "stop"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Job (by name)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/jobs/{{JOB_NAME}}",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "jobs",
+            "{{JOB_NAME}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fetch Result JSON (proxy)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/result?url={{RESULT_URL}}",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "result"
+          ],
+          "query": [
+            {
+              "key": "url",
+              "value": "{{RESULT_URL}}"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
