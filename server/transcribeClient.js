@@ -1,4 +1,6 @@
-const { TranscribeClient, StartTranscriptionJobCommand, GetTranscriptionJobCommand, ListTranscriptionJobsCommand, DeleteTranscriptionJobCommand, StopTranscriptionJobCommand } = require("@aws-sdk/client-transcribe");
+const { TranscribeClient, 
+  StartTranscriptionJobCommand, 
+  GetTranscriptionJobCommand, ListTranscriptionJobsCommand, DeleteTranscriptionJobCommand, StopTranscriptionJobCommand } = require("@aws-sdk/client-transcribe");
 const { safeJobName } = require("./utils");
 
 function requireEnv(name, fallback = null) {

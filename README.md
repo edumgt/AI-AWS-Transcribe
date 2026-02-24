@@ -180,7 +180,7 @@ node scripts/upload-to-s3.js --file ./sample.mp3
 node scripts/start-job.js --mediaUri s3://polly-bucket-edumgt/transcribe-lab/input/sample.mp3 --format mp3 --lang ko-KR
 ```
 node scripts/start-job.js \
-  --mediaUri "s3://polly-bucket-edumgt/transcribe-lab/input/1770525723948-sample.mp3" \
+  --mediaUri "s3://polly-bucket-edumgt/transcribe-lab/input/1771910373810-sample.mp3" \
   --format mp3 \
   --lang ko-KR
 
@@ -205,7 +205,7 @@ root@DESKTOP-D6A344Q:/home/AI-AWS-Transcribe# node scripts/start-job.js \
 ```
 
 # 3) 잡 상태 확인
-node scripts/get-job.js --name transcribe-lab-1770525890213
+node scripts/get-job.js --name transcribe-lab-1771910836157
 
 ```
 root@DESKTOP-D6A344Q:/home/AI-AWS-Transcribe# node scripts/get-job.js --name transcribe-lab-1770525890213
@@ -233,10 +233,10 @@ root@DESKTOP-D6A344Q:/home/AI-AWS-Transcribe# node scripts/get-job.js --name tra
 ```
 
 # 4) 결과 JSON 다운로드
-node scripts/download-result.js --url "https://s3.ap-northeast-2.amazonaws.com/polly-bucket-edumgt/transcribe-lab/output/transcribe-lab-1770525890213.json" --out result.json
+node scripts/download-result.js --url "https://s3.ap-northeast-2.amazonaws.com/polly-bucket-edumgt/transcribe-lab/output/transcribe-lab-1771910836157.json" --out result.json
 
 ```
-aws s3 presign "s3://polly-bucket-edumgt/transcribe-lab/output/transcribe-lab-1770525890213.json" \
+aws s3 presign "s3://polly-bucket-edumgt/transcribe-lab/output/transcribe-lab-1771910836157.json" \
   --region ap-northeast-2 \
   --expires-in 3600
 ```
@@ -248,7 +248,7 @@ root@DESKTOP-D6A344Q:/home/AI-AWS-Transcribe# aws s3 presign "s3://polly-bucket-
 https://polly-bucket-edumgt.s3.ap-northeast-2.amazonaws.com/transcribe-lab/output/transcribe-lab-1770525890213.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIARIBXLWVEV5JWE6CP%2F20260208%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Date=20260208T044748Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=172d7ec94bf3827431b5eba712a053feae08e85e47a200040faa314f5fe1d173
 ```
 ```
-wget -O transcribe.json "https://polly-bucket-edumgt.s3.ap-northeast-2.amazonaws.com/transcribe-lab/output/transcribe-lab-1770525890213.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIARIBXLWVEV5JWE6CP%2F20260208%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Date=20260208T044748Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=172d7ec94bf3827431b5eba712a053feae08e85e47a200040faa314f5fe1d173"
+wget -O transcribe.json "https://polly-bucket-edumgt.s3.ap-northeast-2.amazonaws.com/transcribe-lab/output/transcribe-lab-1771910836157.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIARIBXLWVEYUHA3ME6%2F20260224%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Date=20260224T054544Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=dcb3682aabe70d68548edf616fd9a99338ec09f7cc81aa7fb59ad880c1599768"
 ```
 
 # 5) 자막 변환
