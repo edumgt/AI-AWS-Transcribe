@@ -1,0 +1,46 @@
+name: Publish UI Image to AWS ECR
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "ui/**"
+      - ".github/workflows/publish-ecr-ui.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: transcribe-ui-nginx
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubActionsEcrPushRole
+          role-session-name: github-actions-ecr
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f ui/Dockerfile ./ui
+          docker tag $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG $REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:latest

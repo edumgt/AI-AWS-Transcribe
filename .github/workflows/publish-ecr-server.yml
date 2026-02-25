@@ -1,0 +1,59 @@
+name: Publish Server Image to AWS ECR
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "server/**"
+      - ".github/workflows/publish-ecr-server.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: transcribe-lab-server
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::086015456585:role/GitHubActionsEcrPushRole
+          role-session-name: github-actions-ecr
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image tag
+        id: vars
+        run: |
+          echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Build image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build \
+            -f server/Dockerfile \
+            -t $REGISTRY/${{ env.ECR_REPOSITORY }}:${IMAGE_TAG} \
+            -t $REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
+            ./server
+
+      - name: Push image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:${IMAGE_TAG}
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:latest

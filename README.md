@@ -310,3 +310,7 @@ cd ui
 docker build -t transcribe-ui-nginx .
 docker run -d --name transcribe-ui -p 8080:80 transcribe-ui-nginx
 ```
+
+### OIDC 
+
+![alt text](image-1.png)
