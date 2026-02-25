@@ -14,7 +14,7 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: transcribe-ui-nginx
+  ECR_REPOSITORY: ai/fe
 
 jobs:
   build-and-push:
@@ -28,7 +28,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubActionsEcrPushRole
+          role-to-assume: arn:aws:iam::086015456585:role/GitHubActionsEcrPushRole
           role-session-name: github-actions-ecr
 
       - name: Login to Amazon ECR
