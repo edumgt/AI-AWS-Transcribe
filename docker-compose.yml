@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  transcribe-lab-server:
+    container_name: transcribe-lab-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: transcribe-lab-server:dev
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      AWS_REGION: ap-northeast-2
+
+      # CORS 허용 (프론트가 8080에서 뜬다고 가정)
+      ALLOW_ORIGIN: http://127.0.0.1:8080
+
+      # AWS SDK가 ~/.aws/credentials 의 default profile 사용
+      AWS_PROFILE: default
+    volumes:
+      - ~/.aws:/root/.aws:ro
+    restart: unless-stopped
+
+  transcribe-ui:
+    container_name: transcribe-ui
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    image: transcribe-ui-nginx:dev
+    ports:
+      - "8080:80"
+    depends_on:
+      - transcribe-lab-server
+    restart: unless-stopped
