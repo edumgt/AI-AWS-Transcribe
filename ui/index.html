@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Transcribe Lab UI (Vanilla JS)</title>
+
+  <!-- (선택) Tailwind CDN: UI만 깔끔하게 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-950 text-slate-100">
+  <div class="max-w-6xl mx-auto p-6 space-y-6">
+    <header class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold">Transcribe Lab (Node + Batch Transcribe)</h1>
+      <p class="text-slate-300 text-sm">
+        Upload(학습용) + Start/Get/List/Delete Transcribe Jobs + Result proxy
+      </p>
+    </header>
+
+    <!-- BASE URL -->
+    <section class="rounded-xl border border-slate-800 bg-slate-900/30 p-4">
+      <div class="flex flex-col md:flex-row md:items-end gap-3">
+        <div class="flex-1">
+          <label class="block text-sm text-slate-300 mb-1">BASE_URL</label>
+          <input id="baseUrl" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 outline-none focus:border-slate-600"
+                 placeholder="예: http://localhost:8080" />
+          <p class="text-xs text-slate-400 mt-1">
+            저장하면 localStorage에 기억됩니다.
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnSaveBaseUrl" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">
+            저장
+          </button>
+          <button id="btnHealth" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700">
+            Health 체크
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-3 text-sm">
+        <span class="text-slate-300">상태:</span>
+        <span id="healthStatus" class="ml-2 text-slate-400">-</span>
+      </div>
+    </section>
+
+    <!-- Create Job -->
+    <section class="rounded-xl border border-slate-800 bg-slate-900/30 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Create Job</h2>
+        <button id="btnCreateJob" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500">
+          Job 생성
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm text-slate-300 mb-1">mediaUri (S3 URI)</label>
+          <input id="mediaUri" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 outline-none focus:border-slate-600"
+                 value="s3://YOUR_BUCKET/transcribe-lab/input/sample.mp3" />
+        </div>
+
+        <div>
+          <label class="block text-sm text-slate-300 mb-1">mediaFormat</label>
+          <select id="mediaFormat" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 outline-none focus:border-slate-600">
+            <option value="mp3" selected>mp3</option>
+            <option value="wav">wav</option>
+            <option value="mp4">mp4</option>
+            <option value="flac">flac</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm text-slate-300 mb-1">languageCode</label>
+          <input id="languageCode" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 outline-none focus:border-slate-600"
+                 value="ko-KR" />
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 text-sm text-slate-300">
+            <input id="identifyLanguage" type="checkbox" class="scale-110" />
+            identifyLanguage
+          </label>
+          <label class="flex items-center gap-2 text-sm text-slate-300">
+            <input id="enableSpeakerLabels" type="checkbox" class="scale-110" />
+            enableSpeakerLabels
+          </label>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-300">maxSpeakerLabels</span>
+            <input id="maxSpeakerLabels" type="number" min="2" max="10"
+                   class="w-20 rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 outline-none focus:border-slate-600"
+                   value="2" />
+          </div>
+        </div>
+      </div>
+
+      <details class="rounded-lg border border-slate-800 bg-slate-950 p-3">
+        <summary class="cursor-pointer text-sm text-slate-300">요청 JSON 미리보기</summary>
+        <pre id="createJobPreview" class="mt-2 text-xs text-slate-300 overflow-auto"></pre>
+      </details>
+    </section>
+
+    <!-- Jobs -->
+    <section class="rounded-xl border border-slate-800 bg-slate-900/30 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Jobs</h2>
+        <div class="flex gap-2">
+          <button id="btnListJobs" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700">
+            List Jobs
+          </button>
+          <button id="btnRefresh" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700">
+            새로고침
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="md:col-span-2 rounded-lg border border-slate-800 bg-slate-950 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-slate-300">Jobs 목록</span>
+            <span id="jobsCount" class="text-xs text-slate-400">0</span>
+          </div>
+          <div id="jobsList" class="space-y-2"></div>
+        </div>
+
+        <div class="rounded-lg border border-slate-800 bg-slate-950 p-3 space-y-2">
+          <div>
+            <label class="block text-sm text-slate-300 mb-1">JOB_NAME</label>
+            <input id="jobName" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 outline-none focus:border-slate-600"
+                   placeholder="목록에서 선택하거나 입력" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btnGetJob" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">Get</button>
+            <button id="btnStopJob" class="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500">Stop</button>
+            <button id="btnDeleteJob" class="px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 col-span-2">Delete</button>
+          </div>
+
+          <hr class="border-slate-800 my-2" />
+
+          <div>
+            <label class="block text-sm text-slate-300 mb-1">RESULT_URL (Transcribe 결과 JSON URL)</label>
+            <input id="resultUrl" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 outline-none focus:border-slate-600"
+                   placeholder="예: https://s3....amazonaws.com/...json" />
+            <button id="btnFetchResult" class="mt-2 w-full px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500">
+              Fetch Result JSON (proxy)
+            </button>
+            <p class="text-xs text-slate-400 mt-1">
+              서버의 <code>/result?url=...</code> 프록시 엔드포인트로 가져옵니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Output -->
+    <section class="rounded-xl border border-slate-800 bg-slate-900/30 p-4 space-y-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Response</h2>
+        <div class="flex gap-2">
+          <button id="btnCopy" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700">복사</button>
+          <button id="btnClear" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700">지우기</button>
+        </div>
+      </div>
+      <pre id="output" class="rounded-lg border border-slate-800 bg-slate-950 p-3 text-xs overflow-auto min-h-[180px]"></pre>
+      <div id="toast" class="hidden text-sm text-emerald-300"></div>
+    </section>
+
+    <footer class="text-xs text-slate-500">
+      © Transcribe Lab UI (Vanilla JS)
+    </footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
