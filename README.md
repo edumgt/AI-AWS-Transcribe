@@ -301,3 +301,11 @@ node scripts/json-to-vtt.js --in result.json --out captions.vtt --maxWords 12
 - IAM 최소 권한 예시: `docs/iam-policy.md`
 - 샘플 명령어 모음: `docs/sample-commands.md`
 - 실습 커리큘럼: `docs/transcribe-curriculum.md`
+
+
+## FE UI 추가
+```
+cd ui
+docker build -t transcribe-ui-nginx .
+docker run -d --name transcribe-ui -p 8080:80 transcribe-ui-nginx
+```
